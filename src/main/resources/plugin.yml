@@ -1,0 +1,20 @@
+name: Safe
+version: '${version}'
+
+main: net.sealing99.safe.Safe
+api-version: '26.2'
+load: POSTWORLD
+
+authors: [ Sealing99 ]
+
+commands:
+  bal:
+    usage: /bal
+    description: Shows the player their balance
+  safe:
+    usage: /safe <subcommand> [args]
+    description: Main Safe command
+
+permissions:
+  safe.admin:
+    default: op
