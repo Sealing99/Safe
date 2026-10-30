@@ -1,6 +1,6 @@
 # Safe
 Safe is a very lightweight economy plugin inspired by vault.
-As Safe is an API, this plugin would be used as depencency to other plugins to easily manage balance systems of players using SQLite.
+As Safe is an API, this plugin would be used as dependency to other plugins to easily manage balance systems of players using SQLite.
 
 
 # Depend on Safe
@@ -19,7 +19,7 @@ To use Safe you need other plugins supporting it. Here is how to add Safe as a d
        compileOnly(files("libs/Safe-0.1.0.jar"))
    }
    ```
-6. Reload your gradle project.
+6. Reload your Gradle project.
 
 ## How to use Safe as an API
 Safe has exposed several methods to call to connect to the economy database.
