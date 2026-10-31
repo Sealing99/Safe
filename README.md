@@ -29,9 +29,9 @@ Safe has exposed several methods to call to connect to the economy database.
    ```
    try {
        safeAPI = (Safe) getServer().getPluginManager().getPlugin("Safe");
-       assert safeAPI != null;
    } catch (Exception e) {
        getLogger().severe("Failed to connect to Safe API");
+       setEnabled(false);
        throw new RuntimeException(e);
    }
    ```
