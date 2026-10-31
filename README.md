@@ -40,9 +40,9 @@ Safe has exposed several methods to call to connect to the economy database.
 4. To set/add/remove money:
    ```
    Safe#getBalanceDatabase()
-            .setBalance(String uuid, float bal);
-            .addMoney(String uuid, float amount);
-            .removeMoney(String uuid, float amount);
+            .setBalance(String uuid, BigDecimal bal);
+            .addMoney(String uuid, BigDecimal amount);
+            .removeMoney(String uuid, BigDecimal amount);
    ```
 ##
 Safe automatically saves/loads balances on start/stop, so no further functions to call are needed.

@@ -28,7 +28,7 @@ public class BalanceDatabaseManager {
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS player_balance (
                     uuid TEXT PRIMARY KEY,
-                    balance TEXT NOT NULL DEFAULT '0'
+                    balance INTEGER NOT NULL DEFAULT 0
                 )
             """);
         }
@@ -54,7 +54,7 @@ public class BalanceDatabaseManager {
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, uuid);
-            statement.setFloat(2, cents);
+            statement.setLong(2, cents);
 
             statement.executeUpdate();
         }
@@ -76,7 +76,7 @@ public class BalanceDatabaseManager {
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, uuid);
-            statement.setFloat(2, cents);
+            statement.setLong(2, cents);
 
             statement.executeUpdate();
         }
@@ -84,7 +84,7 @@ public class BalanceDatabaseManager {
         return getBalance(uuid);
     }
 
-    public BigDecimal subtractBalance(String uuid, BigDecimal amount) throws SQLException {
+    public boolean subtractBalance(String uuid, BigDecimal amount) throws SQLException {
         long cents = toCents(amount);
 
         if (cents <= 0) {
@@ -92,19 +92,17 @@ public class BalanceDatabaseManager {
         }
 
         String sql = """
-                UPDATE player_balance
-                SET balance = balance - ?
-                WHERE uuid = ?
-                AND balance >= ?
+                INSERT INTO player_balance (uuid, balance) VALUES (?, ?)
+                ON CONFLICT(uuid) DO UPDATE SET balance = balance - excluded.balance
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, cents);
             statement.setString(2, uuid);
             statement.setLong(3, cents);
-        }
 
-        return getBalance(uuid);
+            return statement.executeUpdate() > 0;
+        }
     }
 
     public BigDecimal getBalance(String uuid) throws SQLException {

@@ -2,7 +2,7 @@ name: Safe
 version: '${version}'
 
 main: net.sealing99.safe.Safe
-api-version: '26.2'
+api-version: '1.21'
 load: STARTUP
 
 authors: [ Sealing99 ]

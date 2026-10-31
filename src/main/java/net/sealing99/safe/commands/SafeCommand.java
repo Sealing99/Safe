@@ -2,6 +2,7 @@ package net.sealing99.safe.commands;
 
 import net.sealing99.safe.Safe;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,13 +24,34 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        if (!sender.hasPermission("safe.admin")) {
+            sender.sendMessage("You do not have permissions to execute this command.");
+            return true;
+        }
+
+        if (args.length == 0) {
+            sender.sendMessage("Incorrect usage: /safe <subcommand> [params]");
+            return true;
+        }
+
         if (args[0].equals("admin")) {
+            if (args.length == 1) {
+                sender.sendMessage("Incorrect usage: /safe admin <subcommand> [params]");
+                return true;
+            }
+
             if (args[1].equals("bal")) {
                 if (args.length != 3) {
                     sender.sendMessage("Incorrect usage");
                     return true;
                 }
-                String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
+                @SuppressWarnings("deprecation")
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+                String uuid = String.valueOf(offlinePlayer.getUniqueId());
+                if (uuid == null || uuid.isEmpty()) {
+                    sender.sendMessage("Player not found");
+                    return true;
+                }
                 BigDecimal bal = plugin.getBalanceDatabase().getBalance(uuid);
                 sender.sendMessage(args[2] + " has $" + bal);
             }
@@ -39,15 +61,21 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("Incorrect usage");
                     return true;
                 }
-                float amount;
+                BigDecimal amount;
                 try {
-                    amount = Float.parseFloat(args[3]);
+                    amount = new BigDecimal(args[3]);
                 } catch (NumberFormatException e) {
                     sender.sendMessage("Incorrect value");
                     return true;
                 }
-                String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
-                BigDecimal result = plugin.getBalanceDatabase().addMoney(uuid, new BigDecimal(amount));
+                @SuppressWarnings("deprecation")
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+                String uuid = String.valueOf(offlinePlayer.getUniqueId());
+                if (uuid == null || uuid.isEmpty()) {
+                    sender.sendMessage("Player not found");
+                    return true;
+                }
+                BigDecimal result = plugin.getBalanceDatabase().addMoney(uuid, amount);
                 sender.sendMessage("Sent $" + amount + " to " + args[2] + ". They now have $" + result);
 
                 return true;
@@ -58,15 +86,21 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("Incorrect usage");
                     return true;
                 }
-                float amount;
+                BigDecimal amount;
                 try {
-                    amount = Float.parseFloat(args[3]);
+                    amount = new BigDecimal(args[3]);
                 } catch (NumberFormatException e) {
                     sender.sendMessage("Incorrect value");
                     return true;
                 }
-                String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
-                BigDecimal result = plugin.getBalanceDatabase().removeMoney(uuid, new BigDecimal(amount));
+                @SuppressWarnings("deprecation")
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+                String uuid = String.valueOf(offlinePlayer.getUniqueId());
+                if (uuid == null || uuid.isEmpty()) {
+                    sender.sendMessage("Player not found");
+                    return true;
+                }
+                BigDecimal result = plugin.getBalanceDatabase().removeMoney(uuid, amount);
                 sender.sendMessage("Removed $" + amount + " from " + args[2] + ". They now have $" + result);
 
                 return true;
@@ -77,15 +111,21 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("Incorrect usage");
                     return true;
                 }
-                float bal;
+                BigDecimal bal;
                 try {
-                    bal = Float.parseFloat(args[3]);
+                    bal = new BigDecimal(args[3]);
                 } catch (NumberFormatException e) {
                     sender.sendMessage("Incorrect value");
                     return true;
                 }
-                String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
-                plugin.getBalanceDatabase().setBalance(uuid, new BigDecimal(bal));
+                @SuppressWarnings("deprecation")
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+                String uuid = String.valueOf(offlinePlayer.getUniqueId());
+                if (uuid == null || uuid.isEmpty()) {
+                    sender.sendMessage("Player not found");
+                    return true;
+                }
+                plugin.getBalanceDatabase().setBalance(uuid, bal);
                 sender.sendMessage("Set " + args[2] + "'s balance to $" + bal);
 
                 return true;

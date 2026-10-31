@@ -20,6 +20,7 @@ public final class Safe extends JavaPlugin {
         } catch (SQLException e) {
             getLogger().severe("Safe Database failed to load!");
             e.printStackTrace();
+            onDisable();
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
