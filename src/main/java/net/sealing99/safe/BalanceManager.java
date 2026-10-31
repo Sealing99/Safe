@@ -25,7 +25,7 @@ public class BalanceManager {
 
     public BigDecimal getBalance(String uuid) {
         try {
-            return balanceDatabase.getBalance(uuid);
+            return balanceDatabase.getBalance(uuid).setScale(2, RoundingMode.UNNECESSARY);
         } catch (SQLException e) {
             Safe.getInstance().getLogger().severe("Database exception caught in getBalance!");
             throw new DatabaseException("Database exception caught in getBalance!", e);
@@ -53,7 +53,7 @@ public class BalanceManager {
         try {
             BigDecimal result = balanceDatabase.addBalance(uuid, amount);
             validateBalance(result);
-            return result;
+            return result.setScale(2, RoundingMode.UNNECESSARY);
         } catch (SQLException e) {
             Safe.getInstance().getLogger().severe("Database exception caught in addMoney!");
             throw new DatabaseException("Database exception caught in addMoney!", e);
@@ -69,7 +69,7 @@ public class BalanceManager {
             }
             BigDecimal value = balanceDatabase.getBalance(uuid);
             validateBalance(value);
-            return value;
+            return value.setScale(2, RoundingMode.UNNECESSARY);
         } catch (SQLException e) {
             Safe.getInstance().getLogger().severe("Database exception caught in removeMoney!");
             throw new DatabaseException("Database exception caught in removeMoney!", e);
@@ -81,6 +81,10 @@ public class BalanceManager {
             throw new EconomyException("BigDecimal caught null.");
         }
 
+        if (value.scale() > 2) {
+            throw new EconomyException("BigDecimal caught with more than 2 decimal places.");
+        }
+
         if (value.setScale(2, RoundingMode.UNNECESSARY).movePointRight(2).longValueExact() < 0) {
             throw new EconomyException("BigDecimal value caught negative.");
         }
@@ -89,6 +93,10 @@ public class BalanceManager {
     private static void validateTransaction(BigDecimal value) {
         if (value == null) {
             throw new EconomyException("BigDecimal caught null.");
+        }
+
+        if (value.scale() > 2) {
+            throw new EconomyException("BigDecimal caught with more than 2 decimal places.");
         }
 
         if (value.setScale(2, RoundingMode.UNNECESSARY).movePointRight(2).longValueExact() <= 0) {

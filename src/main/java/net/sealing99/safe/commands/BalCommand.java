@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class BalCommand implements CommandExecutor {
     private final Safe plugin;
@@ -21,7 +22,7 @@ public class BalCommand implements CommandExecutor {
         if (sender instanceof Player player) {
             BigDecimal bal;
             bal = plugin.getBalanceDatabase().getBalance(String.valueOf(player.getUniqueId()));
-            sender.sendMessage("You have $" + bal);
+            sender.sendMessage("You have $" + bal.setScale(2, RoundingMode.UNNECESSARY));
         }
 
         return true;

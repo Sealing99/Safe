@@ -12,7 +12,6 @@ repositories {
 
 dependencies {
     compileOnly("org.jetbrains:annotations:24.1.0")
-    //compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
 }
 
@@ -22,7 +21,7 @@ java {
 
 tasks {
     runServer {
-        minecraftVersion("1.21")
+        minecraftVersion("26.2")
         jvmArgs("-Xms2G", "-Xmx2G")
     }
 

@@ -1,6 +1,7 @@
 package net.sealing99.safe.commands;
 
 import net.sealing99.safe.Safe;
+import net.sealing99.safe.exception.EconomyException;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +55,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 BigDecimal bal = plugin.getBalanceDatabase().getBalance(uuid);
-                sender.sendMessage(args[2] + " has $" + bal);
+                sender.sendMessage(args[2] + " has $" + bal.setScale(2, RoundingMode.UNNECESSARY));
             }
 
             if (args[1].equals("addmoney")) {
@@ -68,6 +70,10 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("Incorrect value");
                     return true;
                 }
+                if (amount.scale() > 2) {
+                    sender.sendMessage("Value cannot have more than 2 decomal places.");
+                    return true;
+                }
                 @SuppressWarnings("deprecation")
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
                 String uuid = String.valueOf(offlinePlayer.getUniqueId());
@@ -76,7 +82,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 BigDecimal result = plugin.getBalanceDatabase().addMoney(uuid, amount);
-                sender.sendMessage("Sent $" + amount + " to " + args[2] + ". They now have $" + result);
+                sender.sendMessage("Sent $" + amount + " to " + args[2] + ". They now have $" + result.setScale(2, RoundingMode.UNNECESSARY));
 
                 return true;
             }
@@ -93,6 +99,10 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("Incorrect value");
                     return true;
                 }
+                if (amount.scale() > 2) {
+                    sender.sendMessage("Value cannot have more than 2 decomal places.");
+                    return true;
+                }
                 @SuppressWarnings("deprecation")
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
                 String uuid = String.valueOf(offlinePlayer.getUniqueId());
@@ -101,7 +111,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 BigDecimal result = plugin.getBalanceDatabase().removeMoney(uuid, amount);
-                sender.sendMessage("Removed $" + amount + " from " + args[2] + ". They now have $" + result);
+                sender.sendMessage("Removed $" + amount + " from " + args[2] + ". They now have $" + result.setScale(2, RoundingMode.UNNECESSARY));
 
                 return true;
             }
@@ -118,6 +128,10 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("Incorrect value");
                     return true;
                 }
+                if (bal.scale() > 2) {
+                    sender.sendMessage("Value cannot have more than 2 decomal places.");
+                    return true;
+                }
                 @SuppressWarnings("deprecation")
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
                 String uuid = String.valueOf(offlinePlayer.getUniqueId());
@@ -126,7 +140,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 plugin.getBalanceDatabase().setBalance(uuid, bal);
-                sender.sendMessage("Set " + args[2] + "'s balance to $" + bal);
+                sender.sendMessage("Set " + args[2] + "'s balance to $" + bal.setScale(2, RoundingMode.UNNECESSARY));
 
                 return true;
             }

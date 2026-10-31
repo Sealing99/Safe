@@ -99,7 +99,6 @@ public class BalanceDatabaseManager {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, cents);
             statement.setString(2, uuid);
-            statement.setLong(3, cents);
 
             return statement.executeUpdate() > 0;
         }
