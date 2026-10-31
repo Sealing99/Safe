@@ -1,65 +1,85 @@
 package net.sealing99.safe;
 
 import net.sealing99.safe.database.BalanceDatabaseManager;
+import net.sealing99.safe.exception.DatabaseException;
+import net.sealing99.safe.exception.EconomyException;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 
 public class BalanceManager {
     private final BalanceDatabaseManager balanceDatabase;
 
-    public BalanceManager(Safe plugin) {
+    public BalanceManager(Safe plugin) throws SQLException {
         balanceDatabase = new BalanceDatabaseManager(plugin);
 
-        try {
-            balanceDatabase.connect();
-        } catch (SQLException e) {
-            Safe.getInstance().getLogger().severe("Safe database failed to load");
-            e.printStackTrace();
-        }
+        balanceDatabase.connect();
     }
 
-    public void close() {
+    public void close() throws SQLException {
         if (balanceDatabase != null) {
-            try {
-                balanceDatabase.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            balanceDatabase.close();
+        }
+    }
+
+    public BigDecimal getBalance(String uuid) {
+        try {
+            return balanceDatabase.getBalance(uuid);
+        } catch (SQLException e) {
+            Safe.getInstance().getLogger().severe("Database exception caught in getBalance!");
+            throw new DatabaseException("Database exception caught in getBalance!", e);
+        }
+    }
+
+    public void setBalance(String uuid, BigDecimal bal) {
+        validateBigDecimal(bal);
+
+        try {
+            BigDecimal result = balanceDatabase.setBalance(uuid, bal);
+            if (!result.equals(bal)) {
+                throw new DatabaseException("Database update failed at setBalance.");
             }
-        }
-    }
-
-    public float getBalance(String uuid) {
-        return balanceDatabase.getBalance(uuid);
-    }
-
-    public void setBalance(String uuid, float bal) {
-        try {
-            balanceDatabase.setBalance(uuid, bal);
+            validateBigDecimal(result);
         } catch (SQLException e) {
-            Safe.getInstance().getLogger().severe("Exception caught at balanceDatabase.setBalance()!");
-            e.printStackTrace();
+            Safe.getInstance().getLogger().severe("Database exception caught in setBalance!");
+            throw new DatabaseException("Database exception caught in setBalance!", e);
         }
     }
 
-    public float addMoney(String uuid, float amount) {
+    public BigDecimal addMoney(String uuid, BigDecimal amount) {
+        validateBigDecimal(amount);
+
         try {
-            balanceDatabase.addBalance(uuid, amount);
-            return balanceDatabase.getBalance(uuid);
+            BigDecimal result = balanceDatabase.addBalance(uuid, amount);
+            validateBigDecimal(result);
+            return result;
         } catch (SQLException e) {
-            Safe.getInstance().getLogger().severe("Exception caught at balanceDatabase.setBalance()!");
-            e.printStackTrace();
+            Safe.getInstance().getLogger().severe("Database exception caught in addMoney!");
+            throw new DatabaseException("Database exception caught in addMoney!", e);
         }
-        return -1;
     }
 
-    public float removeMoney(String uuid, float amount) {
+    public BigDecimal removeMoney(String uuid, BigDecimal amount) {
+        validateBigDecimal(amount);
+
         try {
-            balanceDatabase.subtractBalance(uuid, amount);
-            return balanceDatabase.getBalance(uuid);
+            BigDecimal result = balanceDatabase.subtractBalance(uuid, amount);
+            validateBigDecimal(result);
+            return result;
         } catch (SQLException e) {
-            Safe.getInstance().getLogger().severe("Exception caught at balanceDatabase.setBalance()!");
-            e.printStackTrace();
+            Safe.getInstance().getLogger().severe("Database exception caught in removeMoney!");
+            throw new DatabaseException("Database exception caught in removeMoney!", e);
         }
-        return -1;
+    }
+
+    private static void validateBigDecimal(BigDecimal value) {
+        if (value == null) {
+            throw new EconomyException("BigDecimal caught null.");
+        }
+
+        if (value.setScale(2, RoundingMode.UNNECESSARY).movePointRight(2).longValueExact() < 0) {
+            throw new EconomyException("BigDecimal value caught negative.");
+        }
     }
 }

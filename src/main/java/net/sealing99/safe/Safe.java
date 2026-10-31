@@ -4,17 +4,25 @@ import net.sealing99.safe.commands.BalCommand;
 import net.sealing99.safe.commands.SafeCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 public final class Safe extends JavaPlugin {
     private static Safe plugin;
     private BalanceManager balanceManager;
-    public static String ID = "Safe";
+    public static final String ID = "Safe";
 
     @Override
     public void onEnable() {
         plugin = this;
-        balanceManager = new BalanceManager(this);
+        try {
+            balanceManager = new BalanceManager(this);
+        } catch (SQLException e) {
+            getLogger().severe("Safe Database failed to load!");
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         getLogger().info("Using database for " + ID);
 
@@ -25,7 +33,11 @@ public final class Safe extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        balanceManager.close();
+        try {
+            balanceManager.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Safe getInstance() {

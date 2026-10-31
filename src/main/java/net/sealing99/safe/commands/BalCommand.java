@@ -7,6 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
+
 public class BalCommand implements CommandExecutor {
     private final Safe plugin;
 
@@ -17,7 +19,7 @@ public class BalCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (sender instanceof Player player) {
-            float bal;
+            BigDecimal bal;
             bal = plugin.getBalanceDatabase().getBalance(String.valueOf(player.getUniqueId()));
             sender.sendMessage("You have $" + bal);
         }

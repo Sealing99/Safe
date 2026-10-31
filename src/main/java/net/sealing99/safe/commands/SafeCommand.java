@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
-                float bal = plugin.getBalanceDatabase().getBalance(uuid);
+                BigDecimal bal = plugin.getBalanceDatabase().getBalance(uuid);
                 sender.sendMessage(args[2] + " has $" + bal);
             }
 
@@ -46,7 +47,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
-                float result = plugin.getBalanceDatabase().addMoney(uuid, amount);
+                BigDecimal result = plugin.getBalanceDatabase().addMoney(uuid, new BigDecimal(amount));
                 sender.sendMessage("Sent $" + amount + " to " + args[2] + ". They now have $" + result);
 
                 return true;
@@ -65,7 +66,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
-                float result = plugin.getBalanceDatabase().removeMoney(uuid, amount);
+                BigDecimal result = plugin.getBalanceDatabase().removeMoney(uuid, new BigDecimal(amount));
                 sender.sendMessage("Removed $" + amount + " from " + args[2] + ". They now have $" + result);
 
                 return true;
@@ -84,7 +85,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 String uuid = String.valueOf(Bukkit.getPlayerUniqueId(args[2]));
-                plugin.getBalanceDatabase().setBalance(uuid, bal);
+                plugin.getBalanceDatabase().setBalance(uuid, new BigDecimal(bal));
                 sender.sendMessage("Set " + args[2] + "'s balance to $" + bal);
 
                 return true;
