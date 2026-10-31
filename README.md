@@ -31,7 +31,9 @@ Safe has exposed several methods to call to connect to the economy database.
        safeAPI = (Safe) getServer().getPluginManager().getPlugin("Safe");
    } catch (Exception e) {
        getLogger().severe("Failed to connect to Safe API");
-       throw new RuntimeException(e);
+       e.printStackTrace();
+       getServer().getPluginManager().disablePlugin(this);
+       return;
    }
    ```
 3. To get a balance, call ```Safe#getBalanceDatabase().getBalance(String uuid)```
