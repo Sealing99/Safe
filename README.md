@@ -6,7 +6,7 @@ As Safe is an API, this plugin would be used as dependency to other plugins to e
 # Depend on Safe
 To use Safe you need other plugins supporting it. Here is how to add Safe as a dependency to your PaperMC project using Gradle.
 
-## Gradle
+## Gradle - manual
 1. Download a Safe .jar file.
 2. Put the file in your development folder inside both ```/libs/``` and ```/run/plugins/```.
 3. In your plugin's ```plugin.yml``` file, add ```Safe``` to your dependencies. It would look like:
@@ -20,6 +20,12 @@ To use Safe you need other plugins supporting it. Here is how to add Safe as a d
    }
    ```
 6. Reload your Gradle project.
+
+## Gradle - jitpack
+1. In your build.gradle(.kts), add ```maven { url = uri("https://jitpack.io") }``` at the end of ```repositories {}```.
+2. Add ```compileOnly("com.github.Sealing99:Safe:${property("safe.version")}")``` to ```dependencies {}```.
+3. In gradle.properties, add ```safe.version=[VERSION]``` (replace [VERSION] with your actual version)
+4. Reload your Gradle project.
 
 ## How to use Safe as an API
 Safe has exposed several methods to call to connect to the economy database.

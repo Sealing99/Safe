@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     id("xyz.jpenilla.run-paper") version "3.1.0"
+    id("maven-publish")
 }
 
 repositories {
@@ -29,6 +30,16 @@ tasks {
         val props = mapOf("version" to version)
         filesMatching("plugin.yml") {
             expand(props)
+        }
+    }
+}
+
+
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
         }
     }
 }
