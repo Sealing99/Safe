@@ -1,8 +1,8 @@
 package net.sealing99.safe.commands;
 
 import net.sealing99.safe.Safe;
-import net.sealing99.safe.exception.EconomyException;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -42,109 +42,127 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            if (args[1].equals("bal")) {
-                if (args.length != 3) {
-                    sender.sendMessage("Incorrect usage");
-                    return true;
+            switch (args[1]) {
+                case "bal" -> {
+                    return bal(sender, args);
                 }
-                @SuppressWarnings("deprecation")
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
-                String uuid = String.valueOf(offlinePlayer.getUniqueId());
-                if (uuid == null || uuid.isEmpty()) {
-                    sender.sendMessage("Player not found");
-                    return true;
+                case "addmoney" -> {
+                    return addMoney(sender, args);
                 }
-                BigDecimal bal = plugin.getBalanceDatabase().getBalance(uuid);
-                sender.sendMessage(args[2] + " has $" + bal.setScale(2, RoundingMode.UNNECESSARY));
+                case "removemoney" -> {
+                    return removeMoney(sender, args);
+                }
+                case "setbalance" -> {
+                    return setBalance(sender, args);
+                }
             }
 
-            if (args[1].equals("addmoney")) {
-                if (args.length != 4) {
-                    sender.sendMessage("Incorrect usage");
-                    return true;
-                }
-                BigDecimal amount;
-                try {
-                    amount = new BigDecimal(args[3]);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage("Incorrect value");
-                    return true;
-                }
-                if (amount.scale() > 2) {
-                    sender.sendMessage("Value cannot have more than 2 decomal places.");
-                    return true;
-                }
-                @SuppressWarnings("deprecation")
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
-                String uuid = String.valueOf(offlinePlayer.getUniqueId());
-                if (uuid == null || uuid.isEmpty()) {
-                    sender.sendMessage("Player not found");
-                    return true;
-                }
-                BigDecimal result = plugin.getBalanceDatabase().addMoney(uuid, amount);
-                sender.sendMessage("Sent $" + amount + " to " + args[2] + ". They now have $" + result.setScale(2, RoundingMode.UNNECESSARY));
-
-                return true;
-            }
-
-            if (args[1].equals("removemoney")) {
-                if (args.length != 4) {
-                    sender.sendMessage("Incorrect usage");
-                    return true;
-                }
-                BigDecimal amount;
-                try {
-                    amount = new BigDecimal(args[3]);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage("Incorrect value");
-                    return true;
-                }
-                if (amount.scale() > 2) {
-                    sender.sendMessage("Value cannot have more than 2 decomal places.");
-                    return true;
-                }
-                @SuppressWarnings("deprecation")
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
-                String uuid = String.valueOf(offlinePlayer.getUniqueId());
-                if (uuid == null || uuid.isEmpty()) {
-                    sender.sendMessage("Player not found");
-                    return true;
-                }
-                BigDecimal result = plugin.getBalanceDatabase().removeMoney(uuid, amount);
-                sender.sendMessage("Removed $" + amount + " from " + args[2] + ". They now have $" + result.setScale(2, RoundingMode.UNNECESSARY));
-
-                return true;
-            }
-
-            if (args[1].equals("setbalance")) {
-                if (args.length != 4) {
-                    sender.sendMessage("Incorrect usage");
-                    return true;
-                }
-                BigDecimal bal;
-                try {
-                    bal = new BigDecimal(args[3]);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage("Incorrect value");
-                    return true;
-                }
-                if (bal.scale() > 2) {
-                    sender.sendMessage("Value cannot have more than 2 decomal places.");
-                    return true;
-                }
-                @SuppressWarnings("deprecation")
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
-                String uuid = String.valueOf(offlinePlayer.getUniqueId());
-                if (uuid == null || uuid.isEmpty()) {
-                    sender.sendMessage("Player not found");
-                    return true;
-                }
-                plugin.getBalanceDatabase().setBalance(uuid, bal);
-                sender.sendMessage("Set " + args[2] + "'s balance to $" + bal.setScale(2, RoundingMode.UNNECESSARY));
-
-                return true;
-            }
         }
+
+        return true;
+    }
+
+    public boolean bal(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
+        if (args.length != 3) {
+            sender.sendMessage("Incorrect usage");
+            return true;
+        }
+        @SuppressWarnings("deprecation")
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+        String uuid = String.valueOf(offlinePlayer.getUniqueId());
+        if (uuid == null || uuid.isEmpty()) {
+            sender.sendMessage("Player not found");
+            return true;
+        }
+        BigDecimal bal = plugin.getBalanceDatabase().getBalance(uuid);
+        sender.sendMessage(args[2] + " has " + ChatColor.BLUE + "$" + bal.setScale(2, RoundingMode.UNNECESSARY));
+
+        return true;
+    }
+
+    public boolean addMoney(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
+        if (args.length != 4) {
+            sender.sendMessage("Incorrect usage");
+            return true;
+        }
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(args[3]);
+        } catch (NumberFormatException e) {
+            sender.sendMessage("Incorrect value");
+            return true;
+        }
+        if (amount.scale() > 2) {
+            sender.sendMessage("Value cannot have more than 2 decimal places.");
+            return true;
+        }
+        @SuppressWarnings("deprecation")
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+        String uuid = String.valueOf(offlinePlayer.getUniqueId());
+        if (uuid == null || uuid.isEmpty()) {
+            sender.sendMessage("Player not found");
+            return true;
+        }
+        BigDecimal result = plugin.getBalanceDatabase().addMoney(uuid, amount);
+        sender.sendMessage("Sent $" + amount + " to " + args[2] + ". They now have " + ChatColor.BLUE + "$" + result.setScale(2, RoundingMode.UNNECESSARY));
+
+        return true;
+    }
+
+    public boolean removeMoney(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
+        if (args.length != 4) {
+            sender.sendMessage("Incorrect usage");
+            return true;
+        }
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(args[3]);
+        } catch (NumberFormatException e) {
+            sender.sendMessage("Incorrect value");
+            return true;
+        }
+        if (amount.scale() > 2) {
+            sender.sendMessage("Value cannot have more than 2 decimal places.");
+            return true;
+        }
+        @SuppressWarnings("deprecation")
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+        String uuid = String.valueOf(offlinePlayer.getUniqueId());
+        if (uuid == null || uuid.isEmpty()) {
+            sender.sendMessage("Player not found");
+            return true;
+        }
+        BigDecimal result = plugin.getBalanceDatabase().removeMoney(uuid, amount);
+        sender.sendMessage("Removed $" + amount + " from " + args[2] + ". They now have " + ChatColor.BLUE + "$" + result.setScale(2, RoundingMode.UNNECESSARY));
+
+        return true;
+    }
+
+    public boolean setBalance(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
+        if (args.length != 4) {
+            sender.sendMessage("Incorrect usage");
+            return true;
+        }
+        BigDecimal bal;
+        try {
+            bal = new BigDecimal(args[3]);
+        } catch (NumberFormatException e) {
+            sender.sendMessage("Incorrect value");
+            return true;
+        }
+        if (bal.scale() > 2) {
+            sender.sendMessage("Value cannot have more than 2 decimal places.");
+            return true;
+        }
+        @SuppressWarnings("deprecation")
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+        String uuid = String.valueOf(offlinePlayer.getUniqueId());
+        if (uuid == null || uuid.isEmpty()) {
+            sender.sendMessage("Player not found");
+            return true;
+        }
+        plugin.getBalanceDatabase().setBalance(uuid, bal);
+        sender.sendMessage("Set " + args[2] + "'s balance to $" + bal.setScale(2, RoundingMode.UNNECESSARY));
 
         return true;
     }

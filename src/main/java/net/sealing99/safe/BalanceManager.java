@@ -7,6 +7,7 @@ import net.sealing99.safe.exception.EconomyException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
+import java.util.List;
 
 public class BalanceManager {
     private final BalanceDatabaseManager balanceDatabase;
@@ -74,6 +75,21 @@ public class BalanceManager {
             Safe.getInstance().getLogger().severe("Database exception caught in removeMoney!");
             throw new DatabaseException("Database exception caught in removeMoney!", e);
         }
+    }
+
+    public List<BigDecimal> transferMoney(String sender, String receiver, BigDecimal amount) {
+        validateTransaction(amount);
+
+        try {
+            return balanceDatabase.transferMoney(sender, receiver, amount);
+        } catch (SQLException e) {
+            Safe.getInstance().getLogger().severe("Database exception caught in transferMoney!");
+            throw new DatabaseException("Database exception caught in transferMoney!", e);
+        }
+    }
+
+    public boolean hasBalance(String uuid) {
+        return balanceDatabase.exists(uuid);
     }
 
     private static void validateBalance(BigDecimal value) {

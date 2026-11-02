@@ -1,11 +1,15 @@
 package net.sealing99.safe.database;
 
+import net.sealing99.safe.Safe;
+import net.sealing99.safe.exception.DatabaseException;
+import net.sealing99.safe.exception.EconomyException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.*;
+import java.util.List;
 
 public class BalanceDatabaseManager {
     private final JavaPlugin plugin;
@@ -87,9 +91,16 @@ public class BalanceDatabaseManager {
     public boolean subtractBalance(String uuid, BigDecimal amount) throws SQLException {
         long cents = toCents(amount);
 
+        BigDecimal previous = getBalance(uuid);
+        if (previous.compareTo(amount) < 0) {
+            throw new EconomyException("Cannot get to negative balance");
+        }
+
         if (cents <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
+
+        Safe.getInstance().getLogger().info("removing " + amount + " from " + uuid);
 
         String sql = """
                 INSERT INTO player_balance (uuid, balance) VALUES (?, ?)
@@ -97,8 +108,8 @@ public class BalanceDatabaseManager {
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, cents);
-            statement.setString(2, uuid);
+            statement.setString(1, uuid);
+            statement.setLong(2, cents);
 
             return statement.executeUpdate() > 0;
         }
@@ -118,6 +129,53 @@ public class BalanceDatabaseManager {
                 return fromCents(result.getLong("balance"));
             }
         }
+    }
+
+    public boolean exists(String uuid) {
+        String sql = "SELECT 1 FROM player_balance WHERE uuid = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, uuid);
+
+            try (ResultSet result = statement.executeQuery()) {
+                return result.next();
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public List<BigDecimal> transferMoney(String sender, String receiver, BigDecimal amount) throws SQLException {
+        long cents = toCents(amount);
+
+        if (cents <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+
+        BigDecimal previousSender = getBalance(sender);
+        if (previousSender.compareTo(amount) < 0) {
+            throw new EconomyException("Cannot get to negative balance");
+        }
+
+        BigDecimal subtractResult;
+
+        try {
+            if (!subtractBalance(sender, amount)) {
+                throw new DatabaseException("Database failed to remove money");
+            }
+            subtractResult = getBalance(sender);
+            subtractResult.setScale(2, RoundingMode.UNNECESSARY);
+            if (previousSender.setScale(2, RoundingMode.UNNECESSARY).subtract(amount).compareTo(subtractResult.setScale(2, RoundingMode.UNNECESSARY)) != 0) {
+                throw new RuntimeException("Failed to subtract balance while transferring money");
+            }
+        } catch (SQLException e) {
+            Safe.getInstance().getLogger().severe("Database exception caught in removeMoney!");
+            throw new DatabaseException("Database exception caught in removeMoney!", e);
+        }
+
+        BigDecimal addResult = addBalance(receiver, amount);
+
+        return List.of(subtractResult, addResult);
     }
 
     private static long toCents(BigDecimal val) {

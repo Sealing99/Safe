@@ -1,6 +1,7 @@
 package net.sealing99.safe;
 
 import net.sealing99.safe.commands.BalCommand;
+import net.sealing99.safe.commands.PayCommand;
 import net.sealing99.safe.commands.SafeCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -30,6 +31,7 @@ public final class Safe extends JavaPlugin {
         getLogger().info("Registering commands for " + ID);
         Objects.requireNonNull(getCommand("bal")).setExecutor(new BalCommand(this));
         Objects.requireNonNull(getCommand("safe")).setExecutor(new SafeCommand(this));
+        Objects.requireNonNull(getCommand("pay")).setExecutor(new PayCommand(this));
     }
 
     @Override

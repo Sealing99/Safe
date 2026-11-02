@@ -14,6 +14,9 @@ commands:
   safe:
     usage: /safe <subcommand> [args]
     description: Main Safe command
+  pay:
+    usage: /pay <playername> <amount>
+    description: Give a player your money
 
 permissions:
   safe.admin:

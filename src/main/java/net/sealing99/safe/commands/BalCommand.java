@@ -1,6 +1,7 @@
 package net.sealing99.safe.commands;
 
 import net.sealing99.safe.Safe;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +23,7 @@ public class BalCommand implements CommandExecutor {
         if (sender instanceof Player player) {
             BigDecimal bal;
             bal = plugin.getBalanceDatabase().getBalance(String.valueOf(player.getUniqueId()));
-            sender.sendMessage("You have $" + bal.setScale(2, RoundingMode.UNNECESSARY));
+            sender.sendMessage("You have " + ChatColor.BLUE + "$" + bal.setScale(2, RoundingMode.UNNECESSARY));
         }
 
         return true;
