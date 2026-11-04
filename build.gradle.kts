@@ -32,10 +32,26 @@ tasks {
     }
 }
 
-publishing {
+/*publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
+
+            groupId = "com.github.Sealing99"
+            artifactId = "safe"
+            version = project.property("version") as String
         }
     }
-}
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Sealing99/Safe")
+
+            credentials {
+                username = providers.gradleProperty("gpr.user").get()
+                password = providers.gradleProperty("gpr.key") .get()
+            }
+        }
+    }
+}*/
