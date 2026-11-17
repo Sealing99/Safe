@@ -17,6 +17,26 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main Bukkit Safe command
+ * <hr>
+ * <ul>
+ *     <li><b>admin:</b>
+ *     <ul>
+ *         <li><b>bal:</b>
+ *         Retrieves the amount of money from any player</li>
+ *         <li><b>addmoney:</b>
+ *         Adds an amount of money to a player</li>
+ *         <li><b>removemoney:</b>
+ *         Removes an amount of money from a player</li>
+ *         <li><b>setbalance:</b>
+ *         Sets the balance of a player to a new value</li>
+ *     </ul></li>
+ * </ul>
+ *
+ * @since Major update: v0.2.0
+ * @author Sealing99
+ */
 public class SafeCommand implements CommandExecutor, TabCompleter {
     private final Safe plugin;
 
@@ -56,7 +76,6 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
                     return setBalance(sender, args);
                 }
             }
-
         }
 
         return true;
@@ -74,7 +93,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("Player not found");
             return true;
         }
-        BigDecimal bal = plugin.getBalanceDatabase().getBalance(uuid);
+        BigDecimal bal = plugin.getBalanceManager().getBalance(uuid);
         sender.sendMessage(args[2] + " has " + ChatColor.BLUE + "$" + bal.setScale(2, RoundingMode.UNNECESSARY));
 
         return true;
@@ -103,7 +122,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("Player not found");
             return true;
         }
-        BigDecimal result = plugin.getBalanceDatabase().addMoney(uuid, amount);
+        BigDecimal result = plugin.getBalanceManager().addMoney(uuid, amount);
         sender.sendMessage("Sent $" + amount + " to " + args[2] + ". They now have " + ChatColor.BLUE + "$" + result.setScale(2, RoundingMode.UNNECESSARY));
 
         return true;
@@ -132,7 +151,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("Player not found");
             return true;
         }
-        BigDecimal result = plugin.getBalanceDatabase().removeMoney(uuid, amount);
+        BigDecimal result = plugin.getBalanceManager().removeMoney(uuid, amount);
         sender.sendMessage("Removed $" + amount + " from " + args[2] + ". They now have " + ChatColor.BLUE + "$" + result.setScale(2, RoundingMode.UNNECESSARY));
 
         return true;
@@ -161,7 +180,7 @@ public class SafeCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("Player not found");
             return true;
         }
-        plugin.getBalanceDatabase().setBalance(uuid, bal);
+        plugin.getBalanceManager().setBalance(uuid, bal);
         sender.sendMessage("Set " + args[2] + "'s balance to $" + bal.setScale(2, RoundingMode.UNNECESSARY));
 
         return true;

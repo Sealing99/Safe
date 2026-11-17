@@ -18,6 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Bukkit command for paying money to other players
+ * @since v0.5.0
+ * @author Sealing99
+ */
 public class PayCommand implements CommandExecutor, TabCompleter {
     private final Safe plugin;
 
@@ -56,13 +61,13 @@ public class PayCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        BigDecimal balance = plugin.getBalanceDatabase().getBalance(senderId);
+        BigDecimal balance = plugin.getBalanceManager().getBalance(senderId);
         if (balance.compareTo(amount) < 0) {
             sender.sendMessage("Insufficient balance");
             return true;
         }
 
-        if (!plugin.getBalanceDatabase().hasBalance(receiverId)) {
+        if (!plugin.getBalanceManager().hasBalance(receiverId)) {
             if (args.length != 3) {
                 sender.sendMessage("Receiver does not have balance (yet). Type " + ChatColor.GOLD + "/pay " + receiverName + " " + args[1] + " confirm" + ChatColor.RESET + " to confirm");
                 return true;
@@ -73,7 +78,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        List<BigDecimal> results = plugin.getBalanceDatabase().transferMoney(senderId, receiverId, amount);
+        List<BigDecimal> results = plugin.getBalanceManager().transferMoney(senderId, receiverId, amount);
 
         sender.sendMessage("Paid " + receiverName + " " + ChatColor.BLUE +"$" + amount);
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();

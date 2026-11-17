@@ -11,6 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * Bukkit command for retrieving balance
+ * @since Major update: v0.2.0
+ * @author Sealing99
+ */
 public class BalCommand implements CommandExecutor {
     private final Safe plugin;
 
@@ -22,7 +27,7 @@ public class BalCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (sender instanceof Player player) {
             BigDecimal bal;
-            bal = plugin.getBalanceDatabase().getBalance(String.valueOf(player.getUniqueId()));
+            bal = plugin.getBalanceManager().getBalance(String.valueOf(player.getUniqueId()));
             sender.sendMessage("You have " + ChatColor.BLUE + "$" + bal.setScale(2, RoundingMode.UNNECESSARY));
         }
 
